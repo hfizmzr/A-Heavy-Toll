@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a44777727e2995045817efa4b532c87e, type: 3}
+  m_Name: Journal1
+  m_EditorClassIdentifier: Assembly-CSharp::AHeavyToll.Data.PredecessorJournal
+  entryId: first_day
+  entryDate: October 14th
+  unlockNight: 1
+  entryContent: First day on the job. The booth is cramped but warm. Highway's quiet
+    at night. Supervisor said something about an 'incident' a few months back but
+    wouldn't elaborate. Just check IDs and wave them through. Easy money.
+  sanityLevel: 1
+  containsWarning: 0
+  mentionsHer: 0
+  isScrawled: 0
+  isBloodstained: 0
+  isTorn: 0
+  readingVoice: {fileID: 0}
