@@ -45,8 +45,6 @@ namespace AHeavyToll.Gameplay
 
         private void Start()
         {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
         }
 
         private void Update()
@@ -82,7 +80,7 @@ namespace AHeavyToll.Gameplay
             rotationX = Mathf.Clamp(rotationX, -lookLimitX, lookLimitX);
 
             rotationY += mouseX;
-            rotationY = Mathf.Clamp(rotationY, -lookLimitY, lookLimitY);
+            // rotationY = Mathf.Clamp(rotationY, -lookLimitY, lookLimitY);
 
             if (cameraHolder != null)
             {
@@ -99,7 +97,18 @@ namespace AHeavyToll.Gameplay
         {
             float horizontal = Input.GetAxis("Horizontal");
             float vertical = Input.GetAxis("Vertical");
-            Vector3 move = transform.right * horizontal + transform.forward * vertical;
+
+            // Use camera direction for movement so walking aligns with where you're looking
+            Vector3 forward = cameraHolder != null ? cameraHolder.forward : transform.forward;
+            Vector3 right = cameraHolder != null ? cameraHolder.right : transform.right;
+
+            // Flatten to the ground plane so looking up/down doesn't affect movement
+            forward.y = 0f;
+            right.y = 0f;
+            forward.Normalize();
+            right.Normalize();
+
+            Vector3 move = right * horizontal + forward * vertical;
             characterController.Move(move * moveSpeed * Time.deltaTime);
         }
 

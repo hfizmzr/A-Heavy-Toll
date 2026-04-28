@@ -51,8 +51,13 @@ namespace AHeavyToll.UI
             if (titleAnimator != null)
                 titleAnimator.SetTrigger(titleFloatTrigger);
 
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            if (AHeavyToll.Managers.CursorManager.Instance != null)
+                AHeavyToll.Managers.CursorManager.Instance.RequestCursor();
+            else
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
         }
 
         public void StartGame()
