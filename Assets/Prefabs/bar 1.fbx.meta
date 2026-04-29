@@ -3,7 +3,22 @@ guid: ddc1bacc645912e4e8dc464871ad8047
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Metal Black
+    second: {fileID: 2100000, guid: ac70ef60fa4abb440a8dc171fb09063e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Red Sign
+    second: {fileID: 2100000, guid: 8eb33546b875c0c41aad7f7c9761ebb5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Yellow Pillor
+    second: {fileID: 2100000, guid: fa1ac43e08d6f8c46af4dd589c389e4a, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
