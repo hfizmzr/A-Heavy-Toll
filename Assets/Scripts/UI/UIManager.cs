@@ -69,30 +69,26 @@ namespace AHeavyToll.UI
         {
             HideAllPanels();
             if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            CursorManager.Instance?.RequestCursor();
         }
 
         public void ShowHUD()
         {
             HideAllPanels();
             if (hudPanel != null) hudPanel.SetActive(true);
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            CursorManager.Instance?.ReleaseCursor();
         }
 
         public void ShowPause()
         {
             if (pausePanel != null) pausePanel.SetActive(true);
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            CursorManager.Instance?.RequestCursor();
         }
 
         public void HidePause()
         {
             if (pausePanel != null) pausePanel.SetActive(false);
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            CursorManager.Instance?.ReleaseCursor();
         }
 
         public void ShowGameOver(EndingType ending)
@@ -119,8 +115,7 @@ namespace AHeavyToll.UI
             if (endingText != null) endingText.text = title;
             if (endingDescription != null) endingDescription.text = desc;
 
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            CursorManager.Instance?.RequestCursor();
         }
 
         public void ShowIncomingCar()

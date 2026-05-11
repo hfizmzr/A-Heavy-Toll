@@ -50,15 +50,7 @@ namespace StarterAssets
 		}
 #endif
 
-			private void Awake()
-	{
-		SetCursorState(cursorLocked);
-		Cursor.visible = false;
-
-		
-	}
-
-		public void MoveInput(Vector2 newMoveDirection)
+			public void MoveInput(Vector2 newMoveDirection)
 		{
 			move = newMoveDirection;
 		} 
@@ -76,19 +68,6 @@ namespace StarterAssets
 		public void SprintInput(bool newSprintState)
 		{
 			sprint = newSprintState;
-		}
-
-		private void OnApplicationFocus(bool hasFocus)
-		{
-			SetCursorState(cursorLocked);
-		}
-
-		private void SetCursorState(bool newState)
-		{
-			Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
-			Cursor.visible = !newState;  
-			
-
 		}
 	}
 	

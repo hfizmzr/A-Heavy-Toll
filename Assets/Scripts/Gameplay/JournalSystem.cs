@@ -75,8 +75,7 @@ namespace AHeavyToll.Gameplay
             if (journalPanel == null) return;
             journalPanel.SetActive(true);
             AudioManager.Instance?.PlayOneShot(journalOpenSound);
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            CursorManager.Instance?.RequestCursor();
             RefreshEntryList();
         }
 
@@ -85,8 +84,7 @@ namespace AHeavyToll.Gameplay
             if (journalPanel != null) journalPanel.SetActive(false);
             if (GameManager.Instance.CurrentState == GameState.Playing)
             {
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
+                CursorManager.Instance?.ReleaseCursor();
             }
         }
 

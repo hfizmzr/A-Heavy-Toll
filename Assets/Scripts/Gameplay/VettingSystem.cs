@@ -78,6 +78,8 @@ namespace AHeavyToll.Managers
 
             // Enable buttons
             SetButtonsInteractable(true);
+
+            CursorManager.Instance?.RequestCursor();
         }
 
         public void MakeDecision(bool allowThrough)
@@ -100,6 +102,7 @@ namespace AHeavyToll.Managers
             if (vettingPanel != null) vettingPanel.SetActive(false);
             isVetting = false;
             currentCar = null;
+            CursorManager.Instance?.ReleaseCursor();
         }
 
         private void SetButtonsInteractable(bool state)
