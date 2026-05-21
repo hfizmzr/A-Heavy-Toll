@@ -15,26 +15,26 @@ namespace AHeavyToll.UI
         public static UIManager Instance { get; private set; }
 
         [Header("Screens")]
-        [SerializeField] private GameObject mainMenuPanel;
-        [SerializeField] private GameObject hudPanel;
-        [SerializeField] private GameObject pausePanel;
-        [SerializeField] private GameObject gameOverPanel;
-        [SerializeField] private GameObject settingsPanel;
+        public GameObject mainMenuPanel;
+        public GameObject hudPanel;
+        public GameObject pausePanel;
+        public GameObject gameOverPanel;
+        public GameObject settingsPanel;
 
         [Header("HUD Elements")]
-        [SerializeField] private TextMeshProUGUI nightText;
-        [SerializeField] private TextMeshProUGUI carsRemainingText;
-        [SerializeField] private Image incomingCarIndicator;
-        [SerializeField] private float indicatorFlashDuration = 1f;
+        public TextMeshProUGUI nightText;
+        public TextMeshProUGUI carsRemainingText;
+        public Image incomingCarIndicator;
+        public float indicatorFlashDuration = 1f;
 
         [Header("Game Over")]
-        [SerializeField] private TextMeshProUGUI endingText;
-        [SerializeField] private TextMeshProUGUI endingDescription;
-        [SerializeField] private Button restartButton;
-        [SerializeField] private Button menuButton;
+        public TextMeshProUGUI endingText;
+        public TextMeshProUGUI endingDescription;
+        public Button restartButton;
+        public Button menuButton;
 
         [Header("VHS Effect Toggle")]
-        [SerializeField] private GameObject vhsEffectObject;
+        public GameObject vhsEffectObject;
 
         private void Awake()
         {

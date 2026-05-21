@@ -15,16 +15,16 @@ namespace AHeavyToll.Horror
         public static JumpscareManager Instance { get; private set; }
 
         [Header("Jumpscare Elements")]
-        [SerializeField] private GameObject jumpscareCanvas;
-        [SerializeField] private Image jumpscareImage;
-        [SerializeField] private Animator jumpscareAnimator;
-        [SerializeField] private AudioSource jumpscareAudio;
+        public GameObject jumpscareCanvas;
+        public Image jumpscareImage;
+        public Animator jumpscareAnimator;
+        public AudioSource jumpscareAudio;
 
         [Header("Jumpscare Clips")]
-        [SerializeField] private Sprite badEndingSprite;
-        [SerializeField] private Sprite hiddenEndingSprite;
-        [SerializeField] private AudioClip badEndingScream;
-        [SerializeField] private AudioClip hiddenEndingAmbience;
+        public Sprite badEndingSprite;
+        public Sprite hiddenEndingSprite;
+        public AudioClip badEndingScream;
+        public AudioClip hiddenEndingAmbience;
 
         [Header("Timing")]
         [SerializeField] private float jumpscareDuration = 3f;

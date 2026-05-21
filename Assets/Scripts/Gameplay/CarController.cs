@@ -14,6 +14,7 @@ namespace AHeavyToll.Gameplay
         [Header("Movement")]
         [SerializeField] private float approachSpeed = 3f;
         [SerializeField] private float exitSpeed = 8f;
+        [SerializeField] private float uTurnSpeed = 5f;
         [SerializeField] private float stopDistance = 2f;
 
         [Header("State")]
@@ -29,6 +30,7 @@ namespace AHeavyToll.Gameplay
 
         private Transform boothPoint;
         private Transform exitPoint;
+        private Transform startingPoint;
         private AudioSource audioSource;
 
         public enum CarState { Approaching, AtBooth, Exiting }
@@ -40,11 +42,12 @@ namespace AHeavyToll.Gameplay
                 audioSource = gameObject.AddComponent<AudioSource>();
         }
 
-        public void Initialize(CarData data, Transform booth, Transform exit)
+        public void Initialize(CarData data, Transform booth, Transform exit, Transform start)
         {
             Data = data;
             boothPoint = booth;
             exitPoint = exit;
+            startingPoint = start;
             currentState = CarState.Approaching;
             decisionMade = false;
 
@@ -81,10 +84,22 @@ namespace AHeavyToll.Gameplay
                     break;
 
                 case CarState.Exiting:
-                    MoveTowards(exitPoint.position, exitSpeed);
-                    if (Vector3.Distance(transform.position, exitPoint.position) < 1f)
+                    if (!decisionAllow)
                     {
-                        CompleteExit();
+                        Vector3 uTurnTarget = startingPoint.position;
+                        MoveTowards(uTurnTarget, uTurnSpeed);
+                        if (Vector3.Distance(transform.position, uTurnTarget) < 2f)
+                        {
+                            CompleteExit();
+                        }
+                    }
+                    else
+                    {
+                        MoveTowards(exitPoint.position, exitSpeed);
+                        if (Vector3.Distance(transform.position, exitPoint.position) < 1f)
+                        {
+                            CompleteExit();
+                        }
                     }
                     break;
             }
