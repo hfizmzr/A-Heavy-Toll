@@ -27,6 +27,7 @@ namespace AHeavyToll.Managers
         [Header("State")]
         [SerializeField] private bool isVetting = false;
         [SerializeField] private CarController currentCar;
+        [SerializeField] private bool pendingDecision;
 
         public bool IsVetting => isVetting;
 
@@ -88,13 +89,18 @@ namespace AHeavyToll.Managers
 
             SetButtonsInteractable(false);
 
+            pendingDecision = allowThrough;
+
             string decisionText = allowThrough ? "PROCEED." : "STOP. RETURN.";
             SubtitleManager.Instance?.ShowSubtitle(decisionText, 2f);
 
-            // Small delay before closing UI
-            Invoke(nameof(FinishVetting), 1.5f);
+            Invoke(nameof(ExecuteDecision), 1.5f);
+        }
 
-            CarQueueManager.Instance?.ProcessDecision(allowThrough);
+        private void ExecuteDecision()
+        {
+            CarQueueManager.Instance?.ProcessDecision(pendingDecision);
+            FinishVetting();
         }
 
         private void FinishVetting()

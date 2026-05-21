@@ -22,10 +22,10 @@ namespace AHeavyToll.Managers
         [SerializeField] private Transform exitPoint;
 
         [Header("Car Database")]
-        [SerializeField] private List<CarData> allCarData = new List<CarData>();
-        [SerializeField] private List<CarData> night1Pool = new List<CarData>();
-        [SerializeField] private List<CarData> night2Pool = new List<CarData>();
-        [SerializeField] private List<CarData> night3Pool = new List<CarData>();
+        public List<CarData> allCarData = new List<CarData>();
+        public List<CarData> night1Pool = new List<CarData>();
+        public List<CarData> night2Pool = new List<CarData>();
+        public List<CarData> night3Pool = new List<CarData>();
 
         [Header("Prefabs")]
         [SerializeField] private GameObject carPrefab; // Base car with CarController
@@ -105,7 +105,7 @@ namespace AHeavyToll.Managers
 
             if (car != null)
             {
-                car.Initialize(selectedData, boothApproachPoint, exitPoint);
+                car.Initialize(selectedData, boothApproachPoint, exitPoint, spawnPoint);
                 activeCars.Add(car);
                 currentCar = car;
 

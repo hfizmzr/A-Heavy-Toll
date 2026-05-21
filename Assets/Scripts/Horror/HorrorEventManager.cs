@@ -54,19 +54,19 @@ namespace AHeavyToll.Horror
         public static HorrorEventManager Instance { get; private set; }
 
         [Header("Event Database")]
-        [SerializeField] private List<HorrorEvent> horrorEvents = new List<HorrorEvent>();
+        public List<HorrorEvent> horrorEvents = new List<HorrorEvent>();
 
         [Header("Booth References")]
-        [SerializeField] private Light boothLight;
-        [SerializeField] private Transform bloodWritingParent;
-        [SerializeField] private Transform scratchesParent;
-        [SerializeField] private Transform glassParent;
-        [SerializeField] private List<GameObject> bloodWritingPrefabs = new List<GameObject>();
-        [SerializeField] private List<GameObject> scratchPrefabs = new List<GameObject>();
-        [SerializeField] private List<GameObject> brokenGlassPrefabs = new List<GameObject>();
+        public Light boothLight;
+        public Transform bloodWritingParent;
+        public Transform scratchesParent;
+        public Transform glassParent;
+        public List<GameObject> bloodWritingPrefabs = new List<GameObject>();
+        public List<GameObject> scratchPrefabs = new List<GameObject>();
+        public List<GameObject> brokenGlassPrefabs = new List<GameObject>();
 
         [Header("Camera")]
-        [SerializeField] private Camera mainCamera;
+        public Camera mainCamera;
 
         [Header("State")]
         [SerializeField] private List<string> triggeredEvents = new List<string>();

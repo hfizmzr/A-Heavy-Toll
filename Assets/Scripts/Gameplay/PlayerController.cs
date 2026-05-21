@@ -130,5 +130,19 @@ namespace AHeavyToll.Gameplay
                 );
             }
         }
+
+        private void OnControllerColliderHit(ControllerColliderHit hit)
+        {
+            if (hit.gameObject.CompareTag("Car"))
+            {
+                Vector3 pushDirection = hit.moveDirection;
+                pushDirection.x = 0;
+                pushDirection.Normalize();
+                float pushForce = 1f;
+                Vector3 push = pushDirection * pushForce;
+                push.x = 0;
+                characterController.Move(push);
+            }
+        }
     }
 }

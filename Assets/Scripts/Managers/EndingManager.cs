@@ -24,9 +24,9 @@ namespace AHeavyToll.Managers
         [SerializeField] private AudioClip hiddenEndingMusic;
 
         [Header("Visual")]
-        [SerializeField] private GameObject goodEndingVisuals;
-        [SerializeField] private GameObject badEndingVisuals;
-        [SerializeField] private GameObject hiddenEndingVisuals;
+        public GameObject goodEndingVisuals;
+        public GameObject badEndingVisuals;
+        public GameObject hiddenEndingVisuals;
 
         private bool endingPlaying = false;
 
