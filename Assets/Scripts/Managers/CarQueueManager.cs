@@ -89,6 +89,12 @@ namespace AHeavyToll.Managers
         {
             if (pool.Count == 0) return;
 
+            if (boothApproachPoint == null || exitPoint == null || spawnPoint == null)
+            {
+                Debug.LogError("CarQueueManager: boothApproachPoint, exitPoint, or spawnPoint is not assigned in the Inspector.");
+                return;
+            }
+
             // Filter by availability and randomize
             List<CarData> validCars = pool.FindAll(c => 
                 (GameManager.Instance.CurrentDay == Day.Night1 && c.appearsNight1) ||

@@ -41,7 +41,6 @@ namespace AHeavyToll.Managers
                 return;
             }
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
 
         private void Start()
@@ -137,6 +136,7 @@ namespace AHeavyToll.Managers
             totalCarsProcessed = 0;
             carsLetThrough = 0;
             CurrentDay = Day.Night1;
+            CurrentState = GameState.Playing;
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 

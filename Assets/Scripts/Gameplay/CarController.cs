@@ -32,6 +32,7 @@ namespace AHeavyToll.Gameplay
         private Transform exitPoint;
         private Transform startingPoint;
         private AudioSource audioSource;
+        private bool isInitialized = false;
 
         public enum CarState { Approaching, AtBooth, Exiting }
 
@@ -65,10 +66,14 @@ namespace AHeavyToll.Gameplay
                 audioSource.spatialBlend = 1f; // 3D audio
                 audioSource.Play();
             }
+
+            isInitialized = true;
         }
 
         private void Update()
         {
+            if (!isInitialized) return;
+
             switch (currentState)
             {
                 case CarState.Approaching:
@@ -107,7 +112,9 @@ namespace AHeavyToll.Gameplay
 
         private void MoveTowards(Vector3 target, float speed)
         {
-            Vector3 direction = (target - transform.position).normalized;
+            Vector3 direction = (target - transform.position);
+            if (direction.sqrMagnitude < 0.0001f) return;
+            direction.Normalize();
             transform.position += direction * speed * Time.deltaTime;
             transform.rotation = Quaternion.LookRotation(direction);
         }
