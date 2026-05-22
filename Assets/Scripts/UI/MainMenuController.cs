@@ -64,7 +64,7 @@ namespace AHeavyToll.UI
         {
             PlayClickSound();
             AudioManager.Instance?.FadeOutMusic(1f);
-            SceneManager.LoadScene("GameScene");
+            SceneManager.LoadScene("GameScene 1");
         }
 
         public void ShowSettings()

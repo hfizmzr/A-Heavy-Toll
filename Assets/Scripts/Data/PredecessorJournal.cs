@@ -11,6 +11,9 @@ namespace AHeavyToll.Data
     [CreateAssetMenu(fileName = "NewJournalEntry", menuName = "A Heavy Toll/Journal Entry")]
     public class PredecessorJournal : ScriptableObject
     {
+        [Header("Display")]
+        public string title;
+
         [Header("Metadata")]
         public string entryId;
         public string entryDate;

@@ -22,10 +22,7 @@ namespace AHeavyToll.Managers
         [SerializeField] private Transform exitPoint;
 
         [Header("Car Database")]
-        [SerializeField] private List<CarData> allCarData = new List<CarData>();
-        [SerializeField] private List<CarData> night1Pool = new List<CarData>();
-        [SerializeField] private List<CarData> night2Pool = new List<CarData>();
-        [SerializeField] private List<CarData> night3Pool = new List<CarData>();
+        public List<CarData> allCarData = new List<CarData>();
 
         [Header("Prefabs")]
         [SerializeField] private GameObject carPrefab; // Base car with CarController
@@ -35,6 +32,8 @@ namespace AHeavyToll.Managers
         [SerializeField] private CarController currentCar = null;
         [SerializeField] private int carsProcessedThisNight = 0;
         [SerializeField] private bool isQueueActive = false;
+
+        private HashSet<CarData> _usedCars = new HashSet<CarData>();
 
         public CarController CurrentCar => currentCar;
         public bool IsProcessingCar => currentCar != null && currentCar.IsAtBooth;
@@ -53,16 +52,7 @@ namespace AHeavyToll.Managers
         {
             carsProcessedThisNight = 0;
             isQueueActive = true;
-
-            List<CarData> pool = day switch
-            {
-                Day.Night1 => night1Pool,
-                Day.Night2 => night2Pool,
-                Day.Night3 => night3Pool,
-                _ => night1Pool
-            };
-
-            StartCoroutine(RunQueue(pool));
+            StartCoroutine(RunQueue(allCarData));
         }
 
         private IEnumerator RunQueue(List<CarData> pool)
@@ -71,6 +61,10 @@ namespace AHeavyToll.Managers
             {
                 if (currentCar == null)
                 {
+                    // Random mid-game jumpscare during idle gap
+                    if (carsProcessedThisNight > 0)
+                        JumpscareManager.Instance?.TryPlayMidGameJumpscare();
+
                     yield return new WaitForSeconds(timeBetweenCars);
 
                     if (!isQueueActive) yield break;
@@ -87,25 +81,46 @@ namespace AHeavyToll.Managers
 
         private void SpawnNextCar(List<CarData> pool)
         {
-            if (pool.Count == 0) return;
+            if (pool.Count == 0)
+            {
+                Debug.LogWarning("CarQueueManager: allCarData is empty. Assign car assets in the Inspector.");
+                return;
+            }
 
-            // Filter by availability and randomize
-            List<CarData> validCars = pool.FindAll(c => 
-                (GameManager.Instance.CurrentDay == Day.Night1 && c.appearsNight1) ||
-                (GameManager.Instance.CurrentDay == Day.Night2 && c.appearsNight2) ||
-                (GameManager.Instance.CurrentDay == Day.Night3 && c.appearsNight3)
-            );
+            if (boothApproachPoint == null || exitPoint == null || spawnPoint == null)
+            {
+                Debug.LogError("CarQueueManager: boothApproachPoint, exitPoint, or spawnPoint is not assigned in the Inspector.");
+                return;
+            }
 
-            if (validCars.Count == 0) validCars = pool;
+            // Filter by night availability
+            Day currentDay = GameManager.Instance != null ? GameManager.Instance.CurrentDay : Day.Night1;
+            List<CarData> validCars = pool.FindAll(c => c != null && (
+                (currentDay == Day.Night1 && c.appearsNight1) ||
+                (currentDay == Day.Night2 && c.appearsNight2) ||
+                (currentDay == Day.Night3 && c.appearsNight3)
+            ));
 
-            CarData selectedData = validCars[Random.Range(0, validCars.Count)];
+            if (validCars.Count == 0)
+            {
+                Debug.LogWarning($"CarQueueManager: No cars match night filter for {GameManager.Instance?.CurrentDay}. Check appearsNight flags on CarData assets.");
+                return;
+            }
+
+            // Prefer unused cars; fall back to repeats if pool exhausted
+            List<CarData> freshCars = validCars.FindAll(c => !_usedCars.Contains(c));
+            CarData selectedData = freshCars.Count > 0
+                ? freshCars[Random.Range(0, freshCars.Count)]
+                : validCars[Random.Range(0, validCars.Count)];
+
+            _usedCars.Add(selectedData);
 
             GameObject carObj = Instantiate(carPrefab, spawnPoint.position, spawnPoint.rotation);
             CarController car = carObj.GetComponent<CarController>();
 
             if (car != null)
             {
-                car.Initialize(selectedData, boothApproachPoint, exitPoint);
+                car.Initialize(selectedData, boothApproachPoint, exitPoint, spawnPoint);
                 activeCars.Add(car);
                 currentCar = car;
 

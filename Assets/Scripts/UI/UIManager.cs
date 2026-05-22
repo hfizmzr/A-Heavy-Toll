@@ -15,26 +15,26 @@ namespace AHeavyToll.UI
         public static UIManager Instance { get; private set; }
 
         [Header("Screens")]
-        [SerializeField] private GameObject mainMenuPanel;
-        [SerializeField] private GameObject hudPanel;
-        [SerializeField] private GameObject pausePanel;
-        [SerializeField] private GameObject gameOverPanel;
-        [SerializeField] private GameObject settingsPanel;
+        public GameObject mainMenuPanel;
+        public GameObject hudPanel;
+        public GameObject pausePanel;
+        public GameObject gameOverPanel;
+        public GameObject settingsPanel;
 
         [Header("HUD Elements")]
-        [SerializeField] private TextMeshProUGUI nightText;
-        [SerializeField] private TextMeshProUGUI carsRemainingText;
-        [SerializeField] private Image incomingCarIndicator;
-        [SerializeField] private float indicatorFlashDuration = 1f;
+        public TextMeshProUGUI nightText;
+        public TextMeshProUGUI carsRemainingText;
+        public Image incomingCarIndicator;
+        public float indicatorFlashDuration = 1f;
 
         [Header("Game Over")]
-        [SerializeField] private TextMeshProUGUI endingText;
-        [SerializeField] private TextMeshProUGUI endingDescription;
-        [SerializeField] private Button restartButton;
-        [SerializeField] private Button menuButton;
+        public TextMeshProUGUI endingText;
+        public TextMeshProUGUI endingDescription;
+        public Button restartButton;
+        public Button menuButton;
 
         [Header("VHS Effect Toggle")]
-        [SerializeField] private GameObject vhsEffectObject;
+        public GameObject vhsEffectObject;
 
         private void Awake()
         {
@@ -44,17 +44,12 @@ namespace AHeavyToll.UI
                 return;
             }
             Instance = this;
+            transform.localScale = Vector3.one;
         }
 
         private void Start()
         {
-            ShowMainMenu();
-
-            if (restartButton != null)
-                restartButton.onClick.AddListener(() => GameManager.Instance?.RestartGame());
-
-            if (menuButton != null)
-                menuButton.onClick.AddListener(() => GameManager.Instance?.QuitToMenu());
+            ShowHUD();
         }
 
         private void Update()
@@ -93,8 +88,52 @@ namespace AHeavyToll.UI
 
         public void ShowGameOver(EndingType ending)
         {
+            CursorManager.Instance?.RequestCursor();
+
+            if (GameManager.Instance != null)
+                GameManager.Instance.CurrentState = GameState.GameOver;
+
+            // Deactivate ending visuals that have conflicting GraphicRaycasters
+            var endingVis = GameObject.Find("EndingVisual_Hidden");
+            if (endingVis != null)
+                endingVis.SetActive(false);
+
+            var endingVisBad = GameObject.Find("EndingVisual_Bad");
+            if (endingVisBad != null)
+                endingVisBad.SetActive(false);
+
+            var endingVisGood = GameObject.Find("EndingVisual_Good");
+            if (endingVisGood != null)
+                endingVisGood.SetActive(false);
+
             HideAllPanels();
-            if (gameOverPanel != null) gameOverPanel.SetActive(true);
+            if (gameOverPanel != null)
+            {
+                gameOverPanel.SetActive(true);
+                gameOverPanel.transform.SetAsLastSibling();
+            }
+
+            if (restartButton != null)
+            {
+                restartButton.interactable = true;
+                restartButton.onClick = new Button.ButtonClickedEvent();
+                restartButton.onClick.AddListener(() => GameManager.Instance?.RestartGame());
+            }
+            else
+            {
+                Debug.LogWarning("[UIManager] restartButton is null in ShowGameOver!");
+            }
+
+            if (menuButton != null)
+            {
+                menuButton.interactable = true;
+                menuButton.onClick = new Button.ButtonClickedEvent();
+                menuButton.onClick.AddListener(() => GameManager.Instance?.QuitToMenu());
+            }
+            else
+            {
+                Debug.LogWarning("[UIManager] menuButton is null in ShowGameOver!");
+            }
 
             string title = ending switch
             {
@@ -114,8 +153,6 @@ namespace AHeavyToll.UI
 
             if (endingText != null) endingText.text = title;
             if (endingDescription != null) endingDescription.text = desc;
-
-            CursorManager.Instance?.RequestCursor();
         }
 
         public void ShowIncomingCar()
@@ -164,5 +201,6 @@ namespace AHeavyToll.UI
             if (vhsEffectObject != null)
                 vhsEffectObject.SetActive(enabled);
         }
+
     }
 }
