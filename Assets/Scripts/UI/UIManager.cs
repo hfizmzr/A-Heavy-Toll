@@ -49,7 +49,7 @@ namespace AHeavyToll.UI
 
         private void Start()
         {
-            ShowMainMenu();
+            ShowHUD();
         }
 
         private void Update()

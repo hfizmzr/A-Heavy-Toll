@@ -62,6 +62,9 @@ namespace AHeavyToll.Managers
             };
 
             Debug.Log($"[GameManager] Starting {dayName}");
+
+            UIManager.Instance?.ShowHUD();
+
             OnDayStart?.Invoke();
 
             // Trigger day-specific atmosphere
