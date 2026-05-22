@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using AHeavyToll.Managers;
 using AHeavyToll.Gameplay;
@@ -27,13 +28,16 @@ namespace AHeavyToll.Gameplay
 
         [Header("Journal Data")]
         [SerializeField] private List<JournalEntry> journalEntries = new List<JournalEntry>();
+        [SerializeField] private List<PredecessorJournal> predecessorJournals = new List<PredecessorJournal>();
 
         [Header("UI")]
         [SerializeField] private GameObject journalPanel;
         [SerializeField] private TextMeshProUGUI journalTitleText;
         [SerializeField] private TextMeshProUGUI journalContentText;
         [SerializeField] private Transform entryListParent;
-        [SerializeField] private GameObject entryButtonPrefab;
+
+        [Header("Scroll")]
+        [SerializeField] private RectTransform entryListContentView;
 
         [Header("Audio")]
         [SerializeField] private AudioClip pageTurnSound;
@@ -53,8 +57,27 @@ namespace AHeavyToll.Gameplay
 
         private void Start()
         {
+            ConvertPredecessorJournals();
             if (journalPanel != null) journalPanel.SetActive(false);
             UnlockEntriesForNight(1);
+        }
+
+        private void ConvertPredecessorJournals()
+        {
+            foreach (PredecessorJournal pj in predecessorJournals)
+            {
+                if (pj == null) continue;
+                if (journalEntries.Exists(e => e.entryId == pj.entryId)) continue;
+                journalEntries.Add(new JournalEntry
+                {
+                    entryId = pj.entryId,
+                    entryTitle = pj.title,
+                    entryText = pj.entryContent,
+                    unlockNight = pj.unlockNight,
+                    isUnlocked = false,
+                    hasBeenRead = false
+                });
+            }
         }
 
         public void UnlockEntriesForNight(int nightNumber)
@@ -103,28 +126,52 @@ namespace AHeavyToll.Gameplay
 
         private void RefreshEntryList()
         {
-            if (entryListParent == null || entryButtonPrefab == null) return;
-            foreach (Transform child in entryListParent)
+            if (entryListParent == null) return;
+            Transform content = entryListContentView != null ? entryListContentView : entryListParent;
+            foreach (Transform child in content)
                 Destroy(child.gameObject);
+
+            float buttonHeight = 40f;
+            int index = 0;
 
             foreach (var entry in journalEntries)
             {
                 if (!entry.isUnlocked) continue;
-                GameObject btn = Instantiate(entryButtonPrefab, entryListParent);
-                TextMeshProUGUI btnText = btn.GetComponentInChildren<TextMeshProUGUI>();
-                UnityEngine.UI.Button button = btn.GetComponent<UnityEngine.UI.Button>();
 
-                if (btnText != null)
-                {
-                    btnText.text = entry.hasBeenRead ? entry.entryTitle : $"{entry.entryTitle} [NEW]";
-                    btnText.color = entry.hasBeenRead ? Color.gray : Color.white;
-                }
-                if (button != null)
-                {
-                    string id = entry.entryId;
-                    button.onClick.AddListener(() => SelectEntry(id));
-                }
+                GameObject btnObj = new GameObject(entry.entryTitle, typeof(RectTransform));
+                btnObj.transform.SetParent(content, false);
+
+                RectTransform btnRt = btnObj.GetComponent<RectTransform>();
+                btnRt.anchorMin = new Vector2(0, 1);
+                btnRt.anchorMax = new Vector2(1, 1);
+                btnRt.sizeDelta = new Vector2(0, buttonHeight);
+                btnRt.anchoredPosition = new Vector2(0, -index * buttonHeight);
+
+                Button button = btnObj.AddComponent<Button>();
+                Image img = btnObj.AddComponent<Image>();
+                img.color = new Color(1, 1, 1, 0.1f);
+
+                GameObject textObj = new GameObject("Text", typeof(RectTransform));
+                textObj.transform.SetParent(btnObj.transform, false);
+                TextMeshProUGUI tmp = textObj.AddComponent<TextMeshProUGUI>();
+                tmp.text = entry.hasBeenRead ? entry.entryTitle : $"{entry.entryTitle} [NEW]";
+                tmp.color = entry.hasBeenRead ? Color.gray : Color.white;
+                tmp.fontSize = 18;
+                tmp.alignment = TextAlignmentOptions.Center;
+
+                RectTransform textRt = tmp.rectTransform;
+                textRt.anchorMin = Vector2.zero;
+                textRt.anchorMax = Vector2.one;
+                textRt.sizeDelta = Vector2.zero;
+
+                string id = entry.entryId;
+                button.onClick.AddListener(() => SelectEntry(id));
+
+                index++;
             }
+
+            if (entryListContentView != null)
+                entryListContentView.sizeDelta = new Vector2(entryListContentView.sizeDelta.x, index * buttonHeight);
         }
 
         private void Update()
