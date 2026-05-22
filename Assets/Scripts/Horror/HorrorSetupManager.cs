@@ -23,12 +23,41 @@ namespace AHeavyToll.Horror
             SetupHorrorEventManager();
             CreateCarDataAssets();
             UpdateCarQueuePools();
-            WireEndingVisuals();
             */
             
+            WireEndingVisuals();
             WireUIManager();
 
             Debug.Log("[HorrorSetup] Setup complete! Check the Inspector for wired references.");
+        }
+
+        [ContextMenu("Check UIManager Wiring")]
+        public void CheckUIManagerWiring()
+        {
+            GameObject canvasObj = FindGameObjectByName("Canvas");
+            if (canvasObj == null)
+            {
+                Debug.LogError("[HorrorSetup] Canvas not found in scene!");
+                return;
+            }
+
+            UIManager ui = canvasObj.GetComponent<UIManager>();
+            if (ui == null)
+            {
+                Debug.LogError("[HorrorSetup] UIManager not found on Canvas!");
+                return;
+            }
+
+            Debug.Log("[HorrorSetup] === UIManager Wiring Check ===");
+            Debug.Log($"  gameOverPanel: {(ui.gameOverPanel != null ? "OK" : "NULL")}");
+            Debug.Log($"  hudPanel: {(ui.hudPanel != null ? "OK" : "NULL")}");
+            Debug.Log($"  endingText: {(ui.endingText != null ? "OK" : "NULL")}");
+            Debug.Log($"  endingDescription: {(ui.endingDescription != null ? "OK" : "NULL")}");
+            Debug.Log($"  restartButton: {(ui.restartButton != null ? "OK" : "NULL")}");
+            Debug.Log($"  menuButton: {(ui.menuButton != null ? "OK" : "NULL")}");
+            Debug.Log($"  nightText: {(ui.nightText != null ? "OK" : "NULL")}");
+            Debug.Log($"  incomingCarIndicator: {(ui.incomingCarIndicator != null ? "OK" : "NULL")}");
+            Debug.Log("[HorrorSetup] ============================");
         }
 
         private void SetupJumpscareManager()
