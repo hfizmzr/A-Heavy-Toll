@@ -31,6 +31,16 @@ namespace AHeavyToll.Horror
         [SerializeField] private float fadeInDuration = 0.1f;
         [SerializeField] private float fadeOutDuration = 2f;
 
+        [Header("Mid-Game Jumpscare")]
+        public Sprite[] midGameSprites;
+        public AudioClip[] midGameAudioClips;
+        [SerializeField] private float midGameDuration = 1f;
+        [SerializeField] private float midGameFadeIn = 0.05f;
+        [SerializeField] private float midGameFadeOut = 0.5f;
+
+        private GraphicRaycaster _canvasRaycaster;
+        private bool _raycasterWasEnabled;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -39,6 +49,9 @@ namespace AHeavyToll.Horror
                 return;
             }
             Instance = this;
+
+            if (jumpscareCanvas != null)
+                _canvasRaycaster = jumpscareCanvas.GetComponent<GraphicRaycaster>();
         }
 
         private void Start()
@@ -55,6 +68,70 @@ namespace AHeavyToll.Horror
         public void PlayHiddenEndingJumpscare()
         {
             StartCoroutine(PlayJumpscareSequence(hiddenEndingSprite, hiddenEndingAmbience, true));
+        }
+
+        public void PlayMidGameJumpscare()
+        {
+            if (midGameSprites == null || midGameSprites.Length == 0) return;
+
+            Sprite sprite = midGameSprites[Random.Range(0, midGameSprites.Length)];
+            AudioClip clip = null;
+            if (midGameAudioClips != null && midGameAudioClips.Length > 0)
+                clip = midGameAudioClips[Random.Range(0, midGameAudioClips.Length)];
+
+            StartCoroutine(PlayMidGameSequence(sprite, clip));
+        }
+
+        private IEnumerator PlayMidGameSequence(Sprite image, AudioClip sound)
+        {
+            if (_canvasRaycaster != null)
+            {
+                _raycasterWasEnabled = _canvasRaycaster.enabled;
+                _canvasRaycaster.enabled = false;
+            }
+
+            if (jumpscareCanvas != null) jumpscareCanvas.SetActive(true);
+            if (jumpscareImage != null)
+            {
+                jumpscareImage.sprite = image;
+                jumpscareImage.color = new Color(1, 1, 1, 0);
+            }
+
+            // Play sound
+            if (jumpscareAudio != null && sound != null)
+            {
+                jumpscareAudio.clip = sound;
+                jumpscareAudio.Play();
+            }
+
+            // Fade in
+            float elapsed = 0f;
+            while (elapsed < midGameFadeIn)
+            {
+                float alpha = Mathf.Lerp(0f, 1f, elapsed / midGameFadeIn);
+                if (jumpscareImage != null) jumpscareImage.color = new Color(1, 1, 1, alpha);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+            if (jumpscareImage != null) jumpscareImage.color = Color.white;
+
+            // Hold
+            yield return new WaitForSeconds(midGameDuration);
+
+            // Fade out
+            elapsed = 0f;
+            while (elapsed < midGameFadeOut)
+            {
+                float alpha = Mathf.Lerp(1f, 0f, elapsed / midGameFadeOut);
+                if (jumpscareImage != null) jumpscareImage.color = new Color(1, 1, 1, alpha);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            if (jumpscareCanvas != null) jumpscareCanvas.SetActive(false);
+
+            if (_canvasRaycaster != null)
+                _canvasRaycaster.enabled = _raycasterWasEnabled;
         }
 
         private IEnumerator PlayJumpscareSequence(Sprite image, AudioClip sound, bool slowFade)

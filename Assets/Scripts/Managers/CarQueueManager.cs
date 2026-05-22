@@ -21,6 +21,9 @@ namespace AHeavyToll.Managers
         [SerializeField] private Transform boothApproachPoint;
         [SerializeField] private Transform exitPoint;
 
+        [Header("Mid-Game Jumpscare")]
+        [SerializeField] [Range(0f, 1f)] private float midGameJumpscareChance = 0.15f;
+
         [Header("Car Database")]
         public List<CarData> allCarData = new List<CarData>();
         public List<CarData> night1Pool = new List<CarData>();
@@ -71,6 +74,10 @@ namespace AHeavyToll.Managers
             {
                 if (currentCar == null)
                 {
+                    // Random mid-game jumpscare during idle gap
+                    if (carsProcessedThisNight > 0 && Random.value < midGameJumpscareChance)
+                        JumpscareManager.Instance?.PlayMidGameJumpscare();
+
                     yield return new WaitForSeconds(timeBetweenCars);
 
                     if (!isQueueActive) yield break;
