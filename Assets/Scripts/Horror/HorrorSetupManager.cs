@@ -22,7 +22,6 @@ namespace AHeavyToll.Horror
             SetupJumpscareManager();
             SetupHorrorEventManager();
             CreateCarDataAssets();
-            UpdateCarQueuePools();
             */
             
             WireEndingVisuals();
@@ -320,38 +319,6 @@ namespace AHeavyToll.Horror
             }
             AssetDatabase.CreateAsset(data, fullPath);
             AssetDatabase.SaveAssets();
-        }
-
-        private void UpdateCarQueuePools()
-        {
-            CarQueueManager queueManager = FindObjectOfType<CarQueueManager>();
-            if (queueManager == null)
-            {
-                Debug.LogWarning("[HorrorSetup] CarQueueManager.Instance not found. Skipping pool updates.");
-                return;
-            }
-
-            CarData car3 = AssetDatabase.LoadAssetAtPath<CarData>("Assets/Scripts/Data/Car3.asset");
-            CarData car4 = AssetDatabase.LoadAssetAtPath<CarData>("Assets/Scripts/Data/Car4.asset");
-            CarData car5 = AssetDatabase.LoadAssetAtPath<CarData>("Assets/Scripts/Data/Car5.asset");
-
-            if (car3 != null && !queueManager.night2Pool.Contains(car3))
-                queueManager.night2Pool.Add(car3);
-            if (car3 != null && !queueManager.night3Pool.Contains(car3))
-                queueManager.night3Pool.Add(car3);
-
-            if (car4 != null && !queueManager.night3Pool.Contains(car4))
-                queueManager.night3Pool.Add(car4);
-
-            if (car5 != null && !queueManager.night3Pool.Contains(car5))
-                queueManager.night3Pool.Add(car5);
-
-            Undo.RecordObject(queueManager, "Update CarQueueManager Pools");
-            EditorUtility.SetDirty(queueManager);
-
-            Debug.Log("[HorrorSetup] Updated CarQueueManager pools:");
-            Debug.Log("  Night2Pool: +Car3 (Marcus Webb)");
-            Debug.Log("  Night3Pool: +Car3 (Marcus Webb), +Car4 (Unknown Driver), +Car5 (She)");
         }
 
         private void WireEndingVisuals()

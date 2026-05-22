@@ -10,6 +10,14 @@ using AHeavyToll.VFX;
 
 namespace AHeavyToll.Horror
 {
+    [System.Serializable]
+    public class MidGameJumpscareConfig
+    {
+        public Sprite[] sprites;
+        public AudioClip[] audioClips;
+        [Range(0f, 1f)] public float chance = 0.15f;
+    }
+
     public class JumpscareManager : MonoBehaviour
     {
         public static JumpscareManager Instance { get; private set; }
@@ -32,11 +40,14 @@ namespace AHeavyToll.Horror
         [SerializeField] private float fadeOutDuration = 2f;
 
         [Header("Mid-Game Jumpscare")]
-        public Sprite[] midGameSprites;
-        public AudioClip[] midGameAudioClips;
         [SerializeField] private float midGameDuration = 1f;
         [SerializeField] private float midGameFadeIn = 0.05f;
         [SerializeField] private float midGameFadeOut = 0.5f;
+
+        [Header("Mid-Game Jumpscare Per Night")]
+        public MidGameJumpscareConfig night1Config;
+        public MidGameJumpscareConfig night2Config;
+        public MidGameJumpscareConfig night3Config;
 
         private GraphicRaycaster _canvasRaycaster;
         private bool _raycasterWasEnabled;
@@ -70,16 +81,32 @@ namespace AHeavyToll.Horror
             StartCoroutine(PlayJumpscareSequence(hiddenEndingSprite, hiddenEndingAmbience, true));
         }
 
-        public void PlayMidGameJumpscare()
+        public bool TryPlayMidGameJumpscare()
         {
-            if (midGameSprites == null || midGameSprites.Length == 0) return;
+            MidGameJumpscareConfig config = GetCurrentNightConfig();
+            if (config == null) return false;
+            if (config.sprites == null || config.sprites.Length == 0) return false;
+            if (Random.value >= config.chance) return false;
 
-            Sprite sprite = midGameSprites[Random.Range(0, midGameSprites.Length)];
+            Sprite sprite = config.sprites[Random.Range(0, config.sprites.Length)];
             AudioClip clip = null;
-            if (midGameAudioClips != null && midGameAudioClips.Length > 0)
-                clip = midGameAudioClips[Random.Range(0, midGameAudioClips.Length)];
+            if (config.audioClips != null && config.audioClips.Length > 0)
+                clip = config.audioClips[Random.Range(0, config.audioClips.Length)];
 
             StartCoroutine(PlayMidGameSequence(sprite, clip));
+            return true;
+        }
+
+        private MidGameJumpscareConfig GetCurrentNightConfig()
+        {
+            if (GameManager.Instance == null) return null;
+            return GameManager.Instance.CurrentDay switch
+            {
+                Day.Night1 => night1Config,
+                Day.Night2 => night2Config,
+                Day.Night3 => night3Config,
+                _ => null
+            };
         }
 
         private IEnumerator PlayMidGameSequence(Sprite image, AudioClip sound)
