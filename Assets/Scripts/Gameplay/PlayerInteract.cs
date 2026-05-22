@@ -44,20 +44,20 @@ namespace AHeavyToll.Gameplay
 
             if (Physics.Raycast(ray, out RaycastHit hit, interactRange, interactLayer))
             {
-                Debug.Log("Hit object: " + hit.collider.name);
+                //Debug.Log("Hit object: " + hit.collider.name);
                 IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
 
                 if (interactable != null)
                 {
-                    Debug.Log("Found interactable!");
+                    //Debug.Log("Found interactable!");
                     currentInteractable = interactable;
                     ShowPrompt(interactable.GetPromptText());
                     return;
                 }else{
-                    Debug.Log("No interactable component found on hit object.");
+                    //Debug.Log("No interactable component found on hit object.");
                 }
             }else{
-                Debug.Log("No object hit by raycast.");
+                //Debug.Log("No object hit by raycast.");
             }
 
             currentInteractable = null;
