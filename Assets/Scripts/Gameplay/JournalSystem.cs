@@ -122,6 +122,8 @@ namespace AHeavyToll.Gameplay
             if (journalTitleText != null) journalTitleText.text = entry.entryTitle;
             if (journalContentText != null) journalContentText.text = entry.entryText;
             AudioManager.Instance?.PlayOneShot(pageTurnSound);
+
+            RefreshEntryList();
         }
 
         private void RefreshEntryList()
@@ -155,7 +157,7 @@ namespace AHeavyToll.Gameplay
                 textObj.transform.SetParent(btnObj.transform, false);
                 TextMeshProUGUI tmp = textObj.AddComponent<TextMeshProUGUI>();
                 tmp.text = entry.hasBeenRead ? entry.entryTitle : $"{entry.entryTitle} [NEW]";
-                tmp.color = entry.hasBeenRead ? Color.gray : Color.white;
+                tmp.color = entry.hasBeenRead ? Color.white : Color.yellow;
                 tmp.fontSize = 18;
                 tmp.alignment = TextAlignmentOptions.Center;
 

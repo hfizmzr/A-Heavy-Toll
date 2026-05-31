@@ -81,7 +81,9 @@ namespace AHeavyToll.Managers
 
             PlayAmbience(ambienceNight1);
 
+            SubtitleManager.Instance?.ShowSubtitle("Night 1. Just another shift.", 1f);
             SubtitleManager.Instance?.ShowSubtitle("Night 1. Just another shift.", 3f);
+            SubtitleManager.Instance?.ShowSubtitle("New Journal Entry Logged. Press 'J' to view.", 3f);
         }
 
         private void ApplyNight2()
@@ -96,6 +98,7 @@ namespace AHeavyToll.Managers
             PlayAmbience(ambienceNight2);
 
             SubtitleManager.Instance?.ShowSubtitle("Night 2. Something feels wrong out there.", 4f);
+            SubtitleManager.Instance?.ShowSubtitle("New Journal Entry Logged. Press 'J' to view.", 3f);
         }
 
         private void ApplyNight3()
@@ -114,6 +117,7 @@ namespace AHeavyToll.Managers
             PlayAmbience(ambienceNight3);
 
             SubtitleManager.Instance?.ShowSubtitle("Night 3. The red fog rolls in. Don't let Her out.", 5f);
+            SubtitleManager.Instance?.ShowSubtitle("New Journal Entry Logged. Press 'J' to view.", 3f);
         }
 
         private void PlayAmbience(AudioClip clip)

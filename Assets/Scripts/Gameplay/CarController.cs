@@ -16,6 +16,7 @@ namespace AHeavyToll.Gameplay
         [SerializeField] private float exitSpeed = 8f;
         [SerializeField] private float uTurnSpeed = 5f;
         [SerializeField] private float stopDistance = 2f;
+        [SerializeField] private Transform stopPoint;
 
         [Header("State")]
         [SerializeField] private CarState currentState = CarState.Approaching;
@@ -43,12 +44,13 @@ namespace AHeavyToll.Gameplay
                 audioSource = gameObject.AddComponent<AudioSource>();
         }
 
-        public void Initialize(CarData data, Transform booth, Transform exit, Transform start)
+        public void Initialize(CarData data, Transform booth, Transform exit, Transform start, Transform stop)
         {
             Data = data;
             boothPoint = booth;
             exitPoint = exit;
             startingPoint = start;
+            stopPoint = stop;
             currentState = CarState.Approaching;
             decisionMade = false;
 
@@ -78,7 +80,7 @@ namespace AHeavyToll.Gameplay
             {
                 case CarState.Approaching:
                     MoveTowards(boothPoint.position, approachSpeed);
-                    if (Vector3.Distance(transform.position, boothPoint.position) <= stopDistance)
+                    if (Vector3.Distance(transform.position, stopPoint.position) <= stopDistance)
                     {
                         ArriveAtBooth();
                     }
@@ -100,10 +102,12 @@ namespace AHeavyToll.Gameplay
                     }
                     else
                     {
+                        bar_open.Instance?.OpenBar();
                         MoveTowards(exitPoint.position, exitSpeed);
                         if (Vector3.Distance(transform.position, exitPoint.position) < 1f)
                         {
                             CompleteExit();
+                            bar_open.Instance?.CloseBar();
                         }
                     }
                     break;

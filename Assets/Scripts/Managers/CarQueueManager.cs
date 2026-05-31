@@ -20,6 +20,7 @@ namespace AHeavyToll.Managers
         [SerializeField] private Transform spawnPoint;
         [SerializeField] private Transform boothApproachPoint;
         [SerializeField] private Transform exitPoint;
+        [SerializeField] private Transform stopPoint;
 
         [Header("Car Database")]
         public List<CarData> allCarData = new List<CarData>();
@@ -120,7 +121,7 @@ namespace AHeavyToll.Managers
 
             if (car != null)
             {
-                car.Initialize(selectedData, boothApproachPoint, exitPoint, spawnPoint);
+                car.Initialize(selectedData, boothApproachPoint, exitPoint, spawnPoint, stopPoint);
                 activeCars.Add(car);
                 currentCar = car;
 

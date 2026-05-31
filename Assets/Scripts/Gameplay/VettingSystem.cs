@@ -5,6 +5,7 @@ using AHeavyToll.Horror;
 using AHeavyToll.UI;
 using AHeavyToll.Data;
 using AHeavyToll.VFX;
+using System.Collections;
 
 namespace AHeavyToll.Managers
 {
@@ -53,6 +54,36 @@ namespace AHeavyToll.Managers
                 vettingPanel.SetActive(false);
         }
 
+        // public void BeginVetting(CarController car)
+        // {
+        //     if (car == null || car.Data == null) return;
+
+        //     currentCar = car;
+        //     isVetting = true;
+
+        //     var data = car.Data;
+
+        //     // Populate UI
+        //     if (driverNameText != null) driverNameText.text = data.driverName;
+        //     if (dialogueText != null) dialogueText.text = $"\"{data.driverDialogue}\"";
+        //     if (documentsText != null) documentsText.text = data.documentsText;
+        //     if (destinationText != null) destinationText.text = $"Destination: {data.destination}";
+        //     if (driverPortrait != null) driverPortrait.sprite = data.driverPortrait;
+
+        //     if (vettingPanel != null) vettingPanel.SetActive(true);
+
+        //     // Play voice if available
+        //     if (data.voiceClip != null)
+        //         AudioManager.Instance?.PlayOneShot(data.voiceClip);
+
+        //     SubtitleManager.Instance?.ShowSubtitle(data.driverDialogue, 4f);
+
+        //     // Enable buttons
+        //     SetButtonsInteractable(true);
+
+        //     CursorManager.Instance?.RequestCursor();
+        // }
+
         public void BeginVetting(CarController car)
         {
             if (car == null || car.Data == null) return;
@@ -60,9 +91,31 @@ namespace AHeavyToll.Managers
             currentCar = car;
             isVetting = true;
 
-            var data = car.Data;
+            StartCoroutine(VettingSequence(car));
+        }
 
-            // Populate UI
+        private IEnumerator VettingSequence(CarController car)
+        {
+            var data = car.Data;
+            float waitTime = 3f;
+
+            // 1. Play voice first
+            if (data.voiceClip != null)
+                waitTime = Mathf.Max(waitTime, data.voiceClip.length);
+                AudioManager.Instance?.PlayOneShot(data.voiceClip);
+
+            // 2. Show only dialogue as subtitle while voice plays
+            SubtitleManager.Instance?.ShowSubtitle(data.driverDialogue, 3f);
+
+            // 3. Wait for audio OR fallback 4 seconds, whichever is longer
+            yield return new WaitForSeconds(waitTime);
+
+            // 4. Now show full UI
+            ShowVettingUI(data);
+        }
+
+        private void ShowVettingUI(CarData data)
+        {
             if (driverNameText != null) driverNameText.text = data.driverName;
             if (dialogueText != null) dialogueText.text = $"\"{data.driverDialogue}\"";
             if (documentsText != null) documentsText.text = data.documentsText;
@@ -71,13 +124,6 @@ namespace AHeavyToll.Managers
 
             if (vettingPanel != null) vettingPanel.SetActive(true);
 
-            // Play voice if available
-            if (data.voiceClip != null)
-                AudioManager.Instance?.PlayOneShot(data.voiceClip);
-
-            SubtitleManager.Instance?.ShowSubtitle(data.driverDialogue, 4f);
-
-            // Enable buttons
             SetButtonsInteractable(true);
 
             CursorManager.Instance?.RequestCursor();
@@ -99,7 +145,7 @@ namespace AHeavyToll.Managers
 
         private void ExecuteDecision()
         {
-            CarQueueManager.Instance?.ProcessDecision(pendingDecision);
+            CarQueueManager.Instance?.ProcessDecision(pendingDecision); 
             FinishVetting();
         }
 
