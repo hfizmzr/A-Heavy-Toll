@@ -101,11 +101,18 @@ namespace AHeavyToll.Managers
 
             // 1. Play voice first
             if (data.voiceClip != null)
+            {
                 waitTime = Mathf.Max(waitTime, data.voiceClip.length);
                 AudioManager.Instance?.PlayOneShot(data.voiceClip);
 
-            // 2. Show only dialogue as subtitle while voice plays
-            SubtitleManager.Instance?.ShowSubtitle(data.driverDialogue, 3f);
+                // Show subtitle for the same length as the voice
+                SubtitleManager.Instance?.ShowSubtitle(data.driverDialogue, data.voiceClip.length);
+            }
+            else
+            {
+                // No voice, just show subtitle for fallback duration
+                SubtitleManager.Instance?.ShowSubtitle(data.driverDialogue, 3f);
+            }
 
             // 3. Wait for audio OR fallback 4 seconds, whichever is longer
             yield return new WaitForSeconds(waitTime);
