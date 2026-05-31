@@ -22,7 +22,7 @@ namespace AHeavyToll.UI
 
         [Header("Settings")]
         [SerializeField] private float fadeInTime = 0.2f;
-        [SerializeField] private float fadeOutTime = 0.5f;
+        [SerializeField] private float fadeOutTime = 0.3f;
         [SerializeField] private int maxConcurrentSubtitles = 3;
 
         private Queue<(string text, float duration)> subtitleQueue = new Queue<(string, float)>();

@@ -59,6 +59,7 @@ namespace AHeavyToll.Managers
 
         public void PlayOneShot(AudioClip clip, float volume = 1f)
         {
+            Debug.Log("PlayOneShot called with: " + (clip ? clip.name : "NULL"));
             if (sfxSource == null || clip == null) return;
             sfxSource.PlayOneShot(clip, volume * masterVolume);
         }

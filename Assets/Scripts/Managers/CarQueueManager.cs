@@ -20,6 +20,8 @@ namespace AHeavyToll.Managers
         [SerializeField] private Transform spawnPoint;
         [SerializeField] private Transform boothApproachPoint;
         [SerializeField] private Transform exitPoint;
+        [SerializeField] private Transform stopPoint;
+        [SerializeField] private CarData specialCarData;
 
         [Header("Car Database")]
         public List<CarData> allCarData = new List<CarData>();
@@ -33,7 +35,9 @@ namespace AHeavyToll.Managers
         [SerializeField] private int carsProcessedThisNight = 0;
         [SerializeField] private bool isQueueActive = false;
 
-        private HashSet<CarData> _usedCars = new HashSet<CarData>();
+        // private HashSet<CarData> _usedCars = new HashSet<CarData>();
+        private HashSet<CarData> usedCarsThisNight = new HashSet<CarData>();
+        private bool specialCarSpawned = false;
 
         public CarController CurrentCar => currentCar;
         public bool IsProcessingCar => currentCar != null && currentCar.IsAtBooth;
@@ -52,6 +56,7 @@ namespace AHeavyToll.Managers
         {
             carsProcessedThisNight = 0;
             isQueueActive = true;
+            usedCarsThisNight.Clear();
             StartCoroutine(RunQueue(allCarData));
         }
 
@@ -108,19 +113,54 @@ namespace AHeavyToll.Managers
             }
 
             // Prefer unused cars; fall back to repeats if pool exhausted
-            List<CarData> freshCars = validCars.FindAll(c => !_usedCars.Contains(c));
-            CarData selectedData = freshCars.Count > 0
-                ? freshCars[Random.Range(0, freshCars.Count)]
-                : validCars[Random.Range(0, validCars.Count)];
+            // List<CarData> freshCars = validCars.FindAll(c => !_usedCars.Contains(c));
+            // CarData selectedData = freshCars.Count > 0
+            //     ? freshCars[Random.Range(0, freshCars.Count)]
+            //     : validCars[Random.Range(0, validCars.Count)];
 
-            _usedCars.Add(selectedData);
+            // _usedCars.Add(selectedData);
+
+            List<CarData> availableCars = validCars.FindAll(c => !usedCarsThisNight.Contains(c));
+            CarData selectedData;
+
+            if (currentDay == Day.Night3)
+            {
+                // Reference to your special car
+                CarData specialCar = specialCarData;
+
+                // If it's the last car of the night and special car hasn't spawned yet → force it
+                if (!specialCarSpawned && carsProcessedThisNight == carsPerNight - 1)
+                {
+                    selectedData = specialCar;
+                    specialCarSpawned = true;
+                }
+                else
+                {
+                    // Otherwise pick randomly
+                    selectedData = availableCars.Count > 0
+                        ? availableCars[Random.Range(0, availableCars.Count)]
+                        : validCars[Random.Range(0, validCars.Count)];
+
+                    // Mark if the special car was chosen randomly
+                    if (selectedData == specialCar)
+                        specialCarSpawned = true;
+                }
+            }
+            else
+            {
+                // Normal random selection for other nights
+                selectedData = availableCars.Count > 0
+                    ? availableCars[Random.Range(0, availableCars.Count)]
+                    : validCars[Random.Range(0, validCars.Count)];
+            }
+            usedCarsThisNight.Add(selectedData);
 
             GameObject carObj = Instantiate(carPrefab, spawnPoint.position, spawnPoint.rotation);
             CarController car = carObj.GetComponent<CarController>();
 
             if (car != null)
             {
-                car.Initialize(selectedData, boothApproachPoint, exitPoint, spawnPoint);
+                car.Initialize(selectedData, boothApproachPoint, exitPoint, spawnPoint, stopPoint);
                 activeCars.Add(car);
                 currentCar = car;
 
