@@ -63,6 +63,7 @@ namespace AHeavyToll.Managers
 
             Debug.Log($"[GameManager] Starting {dayName}");
 
+            JournalSystem.Instance?.UnlockEntriesForNight(CurrentNightNumber);
             UIManager.Instance?.ShowHUD();
 
             OnDayStart?.Invoke();
