@@ -119,6 +119,16 @@ namespace AHeavyToll.Gameplay
             Vector3 direction = (target - transform.position);
             if (direction.sqrMagnitude < 0.0001f) return;
             direction.Normalize();
+
+            float detectionDistance = 3f;
+            if (Physics.Raycast(transform.position + Vector3.up, direction, out RaycastHit hit, detectionDistance))
+            {
+                if (hit.collider.GetComponentInParent<PlayerController>() != null)
+                {
+                    speed *= 0.2f;
+                }
+            }
+
             transform.position += direction * speed * Time.deltaTime;
             transform.rotation = Quaternion.LookRotation(direction);
         }
