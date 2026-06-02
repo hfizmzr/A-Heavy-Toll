@@ -9,7 +9,7 @@ using AHeavyToll.VFX;
 
 namespace AHeavyToll.Gameplay
 {
-    public class CarController : MonoBehaviour
+    public class CarController : MonoBehaviour, IInteractable
     {
         [Header("Movement")]
         [SerializeField] private float approachSpeed = 3f;
@@ -135,7 +135,6 @@ namespace AHeavyToll.Gameplay
             }
 
             // Notify systems
-            VettingSystem.Instance?.BeginVetting(this);
             SubtitleManager.Instance?.ShowSubtitle($"Incoming: {Data.driverName}", 2f);
         }
 
@@ -159,6 +158,19 @@ namespace AHeavyToll.Gameplay
         private void CompleteExit()
         {
             OnCarExited?.Invoke(this);
+        }
+
+        public string GetPromptText()
+        {
+            return "Vet Driver";
+        }
+
+        public void Interact()
+        {
+            if (currentState != CarState.AtBooth) return;
+            if (VettingSystem.Instance == null || VettingSystem.Instance.IsVetting) return;
+
+            VettingSystem.Instance.BeginVetting(this);
         }
 
         private void OnDestroy()
