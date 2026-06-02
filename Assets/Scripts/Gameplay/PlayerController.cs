@@ -133,15 +133,12 @@ namespace AHeavyToll.Gameplay
 
         private void OnControllerColliderHit(ControllerColliderHit hit)
         {
-            if (hit.gameObject.CompareTag("Car"))
+            if (hit.collider.GetComponentInParent<CarController>() != null)
             {
-                Vector3 pushDirection = hit.moveDirection;
-                pushDirection.x = 0;
+                Vector3 pushDirection = (transform.position - hit.collider.transform.position);
+                pushDirection.y = 0;
                 pushDirection.Normalize();
-                float pushForce = 1f;
-                Vector3 push = pushDirection * pushForce;
-                push.x = 0;
-                characterController.Move(push);
+                characterController.Move(pushDirection * 0.5f);
             }
         }
     }
