@@ -106,6 +106,10 @@ namespace AHeavyToll.UI
             if (endingVisGood != null)
                 endingVisGood.SetActive(false);
 
+            var endingVisFired = GameObject.Find("EndingVisual_Fired");
+            if (endingVisFired != null)
+                endingVisFired.SetActive(false);
+
             HideAllPanels();
             if (gameOverPanel != null)
             {
@@ -140,6 +144,7 @@ namespace AHeavyToll.UI
                 EndingType.Good => "GOOD ENDING",
                 EndingType.Bad => "BAD ENDING",
                 EndingType.Hidden => "HIDDEN ENDING",
+                EndingType.Fired => "FIRED ENDING",
                 _ => "UNKNOWN"
             };
 
@@ -148,6 +153,7 @@ namespace AHeavyToll.UI
                 EndingType.Good => "You held the line. The threshold remains sealed. You survive to see the dawn.",
                 EndingType.Bad => "You let them through. The booth is breached. Something follows you home.",
                 EndingType.Hidden => "You let Her out. The road is open. The toll has been paid in full.",
+                EndingType.Fired => "You denied every car. Your superiors have questions.",
                 _ => "..."
             };
 
