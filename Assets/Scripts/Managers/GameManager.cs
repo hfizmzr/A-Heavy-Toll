@@ -11,7 +11,7 @@ namespace AHeavyToll.Managers
 {
     public enum GameState { MainMenu, Playing, Paused, GameOver, Jumpscare }
     public enum Day { Night1, Night2, Night3 }
-    public enum EndingType { Good, Bad, Hidden }
+    public enum EndingType { Good, Bad, Hidden, Fired }
 
     public class GameManager : MonoBehaviour
     {
@@ -63,6 +63,7 @@ namespace AHeavyToll.Managers
 
             Debug.Log($"[GameManager] Starting {dayName}");
 
+            JournalSystem.Instance?.UnlockEntriesForNight(CurrentNightNumber);
             UIManager.Instance?.ShowHUD();
 
             OnDayStart?.Invoke();
@@ -120,14 +121,14 @@ namespace AHeavyToll.Managers
 
         private EndingType DetermineEnding()
         {
-            // Hidden ending takes priority check, but if bad conditions met, bad takes priority per design doc
-            // "If you get Bad and Hidden, only get bad."
-
             if (malevolentSpiritsLetIn > 0)
                 return EndingType.Bad;
 
             if (herWasLetIn)
                 return EndingType.Hidden;
+
+            if (carsLetThrough == 0 && totalCarsProcessed > 0)
+                return EndingType.Fired;
 
             return EndingType.Good;
         }

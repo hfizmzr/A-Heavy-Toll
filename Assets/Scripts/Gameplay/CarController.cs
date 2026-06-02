@@ -9,7 +9,7 @@ using AHeavyToll.VFX;
 
 namespace AHeavyToll.Gameplay
 {
-    public class CarController : MonoBehaviour
+    public class CarController : MonoBehaviour, IInteractable
     {
         [Header("Movement")]
         [SerializeField] private float approachSpeed = 3f;
@@ -119,6 +119,16 @@ namespace AHeavyToll.Gameplay
             Vector3 direction = (target - transform.position);
             if (direction.sqrMagnitude < 0.0001f) return;
             direction.Normalize();
+
+            float detectionDistance = 3f;
+            if (Physics.Raycast(transform.position + Vector3.up, direction, out RaycastHit hit, detectionDistance))
+            {
+                if (hit.collider.GetComponentInParent<PlayerController>() != null)
+                {
+                    speed *= 0.2f;
+                }
+            }
+
             transform.position += direction * speed * Time.deltaTime;
             transform.rotation = Quaternion.LookRotation(direction);
         }
@@ -135,7 +145,6 @@ namespace AHeavyToll.Gameplay
             }
 
             // Notify systems
-            VettingSystem.Instance?.BeginVetting(this);
             SubtitleManager.Instance?.ShowSubtitle($"Incoming: {Data.driverName}", 2f);
         }
 
@@ -159,6 +168,19 @@ namespace AHeavyToll.Gameplay
         private void CompleteExit()
         {
             OnCarExited?.Invoke(this);
+        }
+
+        public string GetPromptText()
+        {
+            return "Vet Driver";
+        }
+
+        public void Interact()
+        {
+            if (currentState != CarState.AtBooth) return;
+            if (VettingSystem.Instance == null || VettingSystem.Instance.IsVetting) return;
+
+            VettingSystem.Instance.BeginVetting(this);
         }
 
         private void OnDestroy()

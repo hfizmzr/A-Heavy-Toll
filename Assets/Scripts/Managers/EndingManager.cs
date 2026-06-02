@@ -22,11 +22,13 @@ namespace AHeavyToll.Managers
         [SerializeField] private AudioClip goodEndingMusic;
         [SerializeField] private AudioClip badEndingMusic;
         [SerializeField] private AudioClip hiddenEndingMusic;
+        [SerializeField] private AudioClip firedEndingMusic;
 
         [Header("Visual")]
         public GameObject goodEndingVisuals;
         public GameObject badEndingVisuals;
         public GameObject hiddenEndingVisuals;
+        public GameObject firedEndingVisuals;
 
         private bool endingPlaying = false;
 
@@ -65,6 +67,9 @@ namespace AHeavyToll.Managers
                     break;
                 case EndingType.Hidden:
                     yield return StartCoroutine(HiddenEnding());
+                    break;
+                case EndingType.Fired:
+                    yield return StartCoroutine(FiredEnding());
                     break;
             }
 
@@ -124,6 +129,18 @@ namespace AHeavyToll.Managers
 
             // Red fog intensifies
             RenderSettings.fogDensity = 0.15f;
+        }
+
+        private IEnumerator FiredEnding()
+        {
+            Debug.Log("[EndingManager] Playing Fired Ending");
+
+            SubtitleManager.Instance?.ShowSubtitle("You stopped them all. They're not happy about it.", 4f);
+
+            yield return new WaitForSeconds(3f);
+
+            if (firedEndingVisuals != null) firedEndingVisuals.SetActive(true);
+            AudioManager.Instance?.PlayMusic(firedEndingMusic);
         }
     }
 }

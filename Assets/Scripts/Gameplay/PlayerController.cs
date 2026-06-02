@@ -30,11 +30,17 @@ namespace AHeavyToll.Gameplay
         [SerializeField] private float bobFrequency = 1.5f;
         [SerializeField] private float bobAmplitude = 0.05f;
 
+        [Header("Safety")]
+        [SerializeField] private Vector3 safeSpawnPosition = new Vector3(0, 1, 0);
+        [SerializeField] private float voidThreshold = -10f;
+
         private CharacterController characterController;
         private float rotationX = 0f;
         private float rotationY = 0f;
         private Vector3 originalCameraPos;
         private float bobTimer = 0f;
+        private float verticalVelocity = 0f;
+        private float carPushCooldown = 0f;
 
         private void Awake()
         {
@@ -49,11 +55,20 @@ namespace AHeavyToll.Gameplay
 
         private void Update()
         {
+            if (transform.position.y < voidThreshold)
+            {
+                transform.position = safeSpawnPosition;
+                verticalVelocity = 0f;
+            }
+
             if (GameManager.Instance != null && 
                 GameManager.Instance.CurrentState != GameState.Playing)
             {
                 return;
             }
+
+            if (carPushCooldown > 0f)
+                carPushCooldown -= Time.deltaTime;
 
             HandleLook();
             HandleMovement();
@@ -63,10 +78,19 @@ namespace AHeavyToll.Gameplay
 
             if (boothCenter != null)
             {
-                Vector3 offset = transform.position - boothCenter.position;
-                if (offset.magnitude > maxDistanceFromCenter)
+                Vector3 playerPos = transform.position;
+                Vector3 centerPos = boothCenter.position;
+                
+                Vector3 horizontalOffset = new Vector3(
+                    playerPos.x - centerPos.x,
+                    0,
+                    playerPos.z - centerPos.z
+                );
+                
+                if (horizontalOffset.magnitude > maxDistanceFromCenter)
                 {
-                    transform.position = boothCenter.position + offset.normalized * maxDistanceFromCenter;
+                    Vector3 constrainedPos = centerPos + horizontalOffset.normalized * maxDistanceFromCenter;
+                    transform.position = new Vector3(constrainedPos.x, playerPos.y, constrainedPos.z);
                 }
             }
         }
@@ -98,17 +122,26 @@ namespace AHeavyToll.Gameplay
             float horizontal = Input.GetAxis("Horizontal");
             float vertical = Input.GetAxis("Vertical");
 
-            // Use camera direction for movement so walking aligns with where you're looking
             Vector3 forward = cameraHolder != null ? cameraHolder.forward : transform.forward;
             Vector3 right = cameraHolder != null ? cameraHolder.right : transform.right;
 
-            // Flatten to the ground plane so looking up/down doesn't affect movement
             forward.y = 0f;
             right.y = 0f;
             forward.Normalize();
             right.Normalize();
 
             Vector3 move = right * horizontal + forward * vertical;
+
+            if (characterController.isGrounded)
+            {
+                verticalVelocity = -2f;
+            }
+            else
+            {
+                verticalVelocity += Physics.gravity.y * Time.deltaTime;
+            }
+
+            move.y = verticalVelocity;
             characterController.Move(move * moveSpeed * Time.deltaTime);
         }
 
@@ -133,15 +166,16 @@ namespace AHeavyToll.Gameplay
 
         private void OnControllerColliderHit(ControllerColliderHit hit)
         {
-            if (hit.gameObject.CompareTag("Car"))
+            CarController car = hit.collider.GetComponentInParent<CarController>();
+            if (car != null && carPushCooldown <= 0f)
             {
-                Vector3 pushDirection = hit.moveDirection;
-                pushDirection.x = 0;
+                Vector3 pushDirection = (transform.position - car.transform.position);
+                pushDirection.y = 0;
                 pushDirection.Normalize();
-                float pushForce = 1f;
-                Vector3 push = pushDirection * pushForce;
-                push.x = 0;
-                characterController.Move(push);
+
+                verticalVelocity = 0f;
+                characterController.Move(pushDirection * 3f);
+                carPushCooldown = 0.5f;
             }
         }
     }
