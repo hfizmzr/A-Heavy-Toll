@@ -115,7 +115,7 @@ namespace AHeavyToll.Managers
         {
             Debug.Log("[EndingManager] Playing Hidden Ending");
 
-            SubtitleManager.Instance?.ShowSubtitle("She is free. The road is Hers now.", 4f);
+            SubtitleManager.Instance?.ShowSubtitle("I'm sorry I couldn't save you then, so let me save you now.", 4f);
 
             JumpscareManager.Instance?.PlayHiddenEndingJumpscare();
 

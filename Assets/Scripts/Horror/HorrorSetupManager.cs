@@ -207,7 +207,7 @@ namespace AHeavyToll.Horror
                 "Ending sequence for hidden ending",
                 flickerLights: true, flickerDuration: 15f,
                 spawnBloodWriting: true, breakGlass: true,
-                subtitleText: "She walks the road now. The toll is paid.",
+                subtitleText: "I'm sorry I couldn't save you then, so let me save you now.",
                 subtitleDuration: 6f,
                 screenShake: true, shakeIntensity: 1.5f, shakeDuration: 8f,
                 night1: true, night2: true, night3: true, triggerChance: 1f

@@ -81,9 +81,9 @@ namespace AHeavyToll.Managers
 
             PlayAmbience(ambienceNight1);
 
-            SubtitleManager.Instance?.ShowSubtitle("Night 1. Just another shift.", 1f);
             SubtitleManager.Instance?.ShowSubtitle("Night 1. Just another shift.", 3f);
-            SubtitleManager.Instance?.ShowSubtitle("New Journal Entry Logged. Press 'J' to view.", 3f);
+            SubtitleManager.Instance?.ShowSubtitle("Night 1. Just another shift.", 3f);
+            SubtitleManager.Instance?.ShowSubtitle("New Entry Logged. Press 'J' to view.", 3f);
         }
 
         private void ApplyNight2()
@@ -97,8 +97,8 @@ namespace AHeavyToll.Managers
 
             PlayAmbience(ambienceNight2);
 
-            SubtitleManager.Instance?.ShowSubtitle("Night 2. Something feels wrong out there.", 4f);
-            SubtitleManager.Instance?.ShowSubtitle("New Journal Entry Logged. Press 'J' to view.", 3f);
+            SubtitleManager.Instance?.ShowSubtitle("Night 2. She went to this highway... years ago.", 4f);
+            SubtitleManager.Instance?.ShowSubtitle("New Entry Logged. Press 'J' to view.", 3f);
         }
 
         private void ApplyNight3()

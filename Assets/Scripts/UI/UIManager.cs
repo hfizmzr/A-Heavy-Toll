@@ -152,7 +152,7 @@ namespace AHeavyToll.UI
             {
                 EndingType.Good => "You held the line. The threshold remains sealed. You survive to see the dawn.",
                 EndingType.Bad => "You let them through. The booth is breached. Something follows you home.",
-                EndingType.Hidden => "You let Her out. The road is open. The toll has been paid in full.",
+                EndingType.Hidden => "May her soul rest in peace, for those who silenced her will find no such mercy.",
                 EndingType.Fired => "You denied every car. Your superiors have questions.",
                 _ => "..."
             };
