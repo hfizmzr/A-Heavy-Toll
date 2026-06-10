@@ -189,6 +189,9 @@ namespace AHeavyToll.Managers
             }
 
             carsProcessedThisNight++;
+            JournalSystem.Instance?.UnlockEntriesAfterCarCount(
+                GameManager.Instance?.CurrentNightNumber ?? 1,
+                carsProcessedThisNight);
             currentCar.DriveAway();
         }
 

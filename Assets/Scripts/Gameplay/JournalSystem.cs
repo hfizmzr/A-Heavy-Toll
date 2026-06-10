@@ -18,6 +18,7 @@ namespace AHeavyToll.Gameplay
         public string entryTitle;
         [TextArea(3, 10)] public string entryText;
         public int unlockNight;
+        public int unlockAfterCarCount;
         public bool isUnlocked = false;
         public bool hasBeenRead = false;
     }
@@ -111,6 +112,7 @@ namespace AHeavyToll.Gameplay
                     entryTitle = pj.title,
                     entryText = pj.entryContent,
                     unlockNight = pj.unlockNight,
+                    unlockAfterCarCount = pj.unlockAfterCarCount,
                     isUnlocked = false,
                     hasBeenRead = false
                 });
@@ -121,13 +123,32 @@ namespace AHeavyToll.Gameplay
         {
             foreach (var entry in journalEntries)
             {
-                if (entry.unlockNight == nightNumber && !entry.isUnlocked)
+                if (entry.unlockNight == nightNumber && entry.unlockAfterCarCount == 0 && !entry.isUnlocked)
                 {
                     entry.isUnlocked = true;
                     Debug.Log($"[Journal] Unlocked: {entry.entryTitle}");
                 }
             }
             RefreshEntryList();
+        }
+
+        public void UnlockEntriesAfterCarCount(int nightNumber, int carCount)
+        {
+            bool anyUnlocked = false;
+            foreach (var entry in journalEntries)
+            {
+                if (entry.unlockNight == nightNumber && entry.unlockAfterCarCount == carCount && !entry.isUnlocked)
+                {
+                    entry.isUnlocked = true;
+                    anyUnlocked = true;
+                    Debug.Log($"[Journal] Unlocked after car {carCount}: {entry.entryTitle}");
+                }
+            }
+            if (anyUnlocked)
+            {
+                SubtitleManager.Instance?.ShowSubtitle("New entry found. Press 'J' to view.", 3f);
+                RefreshEntryList();
+            }
         }
 
         public void OpenJournal()

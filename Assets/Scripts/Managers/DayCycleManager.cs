@@ -116,7 +116,10 @@ namespace AHeavyToll.Managers
 
             PlayAmbience(ambienceNight3);
 
-            SubtitleManager.Instance?.ShowSubtitle("Night 3. The red fog rolls in. Don't let Her out.", 5f);
+            SubtitleManager.Instance?.ShowSubtitle("The red fog. He wrote about this.", 3f);
+            SubtitleManager.Instance?.ShowSubtitle("I kept telling myself it was a coincidence. The highway. The posting.", 4f);
+            SubtitleManager.Instance?.ShowSubtitle("Did they know what she was to me?", 4f);
+            SubtitleManager.Instance?.ShowSubtitle("Does it change anything if they did?", 5f);
             SubtitleManager.Instance?.ShowSubtitle("New Journal Entry Logged. Press 'J' to view.", 3f);
         }
 

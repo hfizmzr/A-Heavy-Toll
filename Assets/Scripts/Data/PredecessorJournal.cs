@@ -18,6 +18,7 @@ namespace AHeavyToll.Data
         public string entryId;
         public string entryDate;
         public int unlockNight = 1;
+        public int unlockAfterCarCount = 0; // 0 = on night start; >0 = after N cars processed
 
         [Header("Content")]
         [TextArea(5, 20)] public string entryContent;
