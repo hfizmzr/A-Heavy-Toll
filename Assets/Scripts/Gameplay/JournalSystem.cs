@@ -46,6 +46,7 @@ namespace AHeavyToll.Gameplay
 
         private JournalEntry currentEntry;
         private ScrollRect _contentScrollRect;
+        private ScrollRect _entryScrollRect;
 
         private void Awake()
         {
@@ -62,7 +63,53 @@ namespace AHeavyToll.Gameplay
             ConvertPredecessorJournals();
             if (journalPanel != null) journalPanel.SetActive(false);
             SetupContentScrolling();
+            FixEntryListLayout();
             UnlockEntriesForNight(1);
+        }
+
+        private void FixEntryListLayout()
+        {
+            if (entryListContentView == null) return;
+
+            Transform entryListRoot = entryListContentView.parent;
+
+            // The VerticalLayoutGroup on EntryList fights ScrollRect every frame —
+            // VLG repositions EntryContent to stack it with the Viewport/Scrollbar children,
+            // overriding the offset ScrollRect applies when scrolling. Remove it.
+            if (entryListRoot != null)
+            {
+                VerticalLayoutGroup vlg = entryListRoot.GetComponent<VerticalLayoutGroup>();
+                if (vlg != null) Destroy(vlg);
+            }
+
+            _entryScrollRect = entryListRoot?.GetComponent<ScrollRect>();
+            if (_entryScrollRect != null)
+            {
+                // Move EntryContent inside the Viewport — it was a sibling, which means
+                // the Viewport's Mask never clipped it and scroll bounds were off.
+                if (_entryScrollRect.viewport != null &&
+                    entryListContentView.parent != _entryScrollRect.viewport)
+                {
+                    entryListContentView.SetParent(_entryScrollRect.viewport, false);
+                }
+
+                // The Sliding Area has sizeDelta (-20, -20). With a 20px-wide scrollbar
+                // that makes it 0px wide — the handle can never be clicked. Fix to (0, -20).
+                Scrollbar sb = _entryScrollRect.verticalScrollbar;
+                if (sb != null && sb.handleRect != null)
+                {
+                    RectTransform slidingArea = sb.handleRect.parent as RectTransform;
+                    if (slidingArea != null)
+                        slidingArea.sizeDelta = new Vector2(0, -20);
+                }
+            }
+
+            // EntryContent needs top-anchored layout so it expands downward and
+            // the manual anchoredPosition stacking in RefreshEntryList lines up correctly.
+            entryListContentView.anchorMin = new Vector2(0, 1);
+            entryListContentView.anchorMax = new Vector2(1, 1);
+            entryListContentView.pivot = new Vector2(0.5f, 1f);
+            entryListContentView.anchoredPosition = Vector2.zero;
         }
 
         private void SetupContentScrolling()
@@ -158,6 +205,9 @@ namespace AHeavyToll.Gameplay
             AudioManager.Instance?.PlayOneShot(journalOpenSound);
             CursorManager.Instance?.RequestCursor();
             RefreshEntryList();
+            // The scene serializes the scrollbar at value 0 (bottom). Reset to top on every open.
+            if (_entryScrollRect != null)
+                _entryScrollRect.verticalNormalizedPosition = 1f;
         }
 
         public void CloseJournal()
@@ -220,6 +270,7 @@ namespace AHeavyToll.Gameplay
                 RectTransform btnRt = btnObj.GetComponent<RectTransform>();
                 btnRt.anchorMin = new Vector2(0, 1);
                 btnRt.anchorMax = new Vector2(1, 1);
+                btnRt.pivot = new Vector2(0.5f, 1f);
                 btnRt.sizeDelta = new Vector2(0, buttonHeight);
                 btnRt.anchoredPosition = new Vector2(0, -index * buttonHeight);
 
