@@ -97,6 +97,8 @@ namespace AHeavyToll.Gameplay
 
         private void HandleLook()
         {
+            if (Cursor.lockState != CursorLockMode.Locked) return;
+
             float mouseX = Input.GetAxis("Mouse X") * lookSpeed;
             float mouseY = Input.GetAxis("Mouse Y") * lookSpeed;
 

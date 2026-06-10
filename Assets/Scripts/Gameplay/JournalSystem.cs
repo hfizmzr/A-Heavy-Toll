@@ -44,6 +44,7 @@ namespace AHeavyToll.Gameplay
         [SerializeField] private AudioClip journalOpenSound;
 
         private JournalEntry currentEntry;
+        private ScrollRect _contentScrollRect;
 
         private void Awake()
         {
@@ -59,7 +60,43 @@ namespace AHeavyToll.Gameplay
         {
             ConvertPredecessorJournals();
             if (journalPanel != null) journalPanel.SetActive(false);
+            SetupContentScrolling();
             UnlockEntriesForNight(1);
+        }
+
+        private void SetupContentScrolling()
+        {
+            if (journalContentText == null) return;
+
+            // Remove ContentSizeFitter from the text itself
+            ContentSizeFitter csf = journalContentText.GetComponent<ContentSizeFitter>();
+            if (csf != null) Destroy(csf);
+
+            // Remove ContentSizeFitter from the content container (parent) too —
+            // it keeps marking layout dirty, which causes ScrollRect.LateUpdate to
+            // recalculate bounds and snap the scroll position back to top.
+            RectTransform parentRt = journalContentText.transform.parent as RectTransform;
+            if (parentRt != null)
+            {
+                ContentSizeFitter parentCsf = parentRt.GetComponent<ContentSizeFitter>();
+                if (parentCsf != null) Destroy(parentCsf);
+            }
+
+            _contentScrollRect = journalContentText.GetComponentInParent<ScrollRect>();
+            if (_contentScrollRect != null)
+            {
+                _contentScrollRect.horizontal = false;
+                _contentScrollRect.scrollSensitivity = 30f;
+
+                // Widen the scroll rect and its container so more text fits per line
+                RectTransform scrollRt = _contentScrollRect.GetComponent<RectTransform>();
+                if (scrollRt != null)
+                    scrollRt.sizeDelta = new Vector2(350, scrollRt.sizeDelta.y);
+
+                RectTransform containerParentRt = scrollRt != null ? scrollRt.parent as RectTransform : null;
+                if (containerParentRt != null)
+                    containerParentRt.sizeDelta = new Vector2(350, containerParentRt.sizeDelta.y);
+            }
         }
 
         private void ConvertPredecessorJournals()
@@ -120,7 +157,23 @@ namespace AHeavyToll.Gameplay
             entry.hasBeenRead = true;
 
             if (journalTitleText != null) journalTitleText.text = entry.entryTitle;
-            if (journalContentText != null) journalContentText.text = entry.entryText;
+            if (journalContentText != null)
+            {
+                journalContentText.text = entry.entryText;
+                journalContentText.ForceMeshUpdate();
+
+                RectTransform textRt = journalContentText.rectTransform;
+                float textHeight = journalContentText.preferredHeight;
+
+                textRt.sizeDelta = new Vector2(textRt.sizeDelta.x, textHeight);
+
+                RectTransform containerRt = textRt.parent as RectTransform;
+                if (containerRt != null)
+                    containerRt.sizeDelta = new Vector2(containerRt.sizeDelta.x, textHeight + 40f);
+
+                Canvas.ForceUpdateCanvases();
+                StartCoroutine(ResetScrollNextFrame());
+            }
             AudioManager.Instance?.PlayOneShot(pageTurnSound);
 
             RefreshEntryList();
@@ -176,6 +229,12 @@ namespace AHeavyToll.Gameplay
                 entryListContentView.sizeDelta = new Vector2(entryListContentView.sizeDelta.x, index * buttonHeight);
         }
 
+        private System.Collections.IEnumerator ResetScrollNextFrame()
+        {
+            yield return null;
+            if (_contentScrollRect != null) _contentScrollRect.normalizedPosition = new Vector2(0, 1);
+        }
+
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.J))
@@ -184,6 +243,16 @@ namespace AHeavyToll.Gameplay
                     CloseJournal();
                 else
                     OpenJournal();
+            }
+
+            if (journalPanel != null && journalPanel.activeSelf && _contentScrollRect != null)
+            {
+                float scroll = Input.mouseScrollDelta.y;
+                if (Mathf.Abs(scroll) > 0.001f)
+                {
+                    _contentScrollRect.verticalNormalizedPosition =
+                        Mathf.Clamp01(_contentScrollRect.verticalNormalizedPosition + scroll * 0.05f);
+                }
             }
         }
     }
