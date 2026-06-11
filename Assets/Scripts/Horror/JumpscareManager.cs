@@ -86,7 +86,6 @@ namespace AHeavyToll.Horror
             MidGameJumpscareConfig config = GetCurrentNightConfig();
             if (config == null) return false;
             if (config.sprites == null || config.sprites.Length == 0) return false;
-            if (Random.value >= config.chance) return false;
 
             Sprite sprite = config.sprites[Random.Range(0, config.sprites.Length)];
             AudioClip clip = null;

@@ -1,15 +1,18 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEditor;
 using TMPro;
 using System.Collections.Generic;
 using AHeavyToll.Horror;
 using AHeavyToll.Managers;
 using AHeavyToll.Data;
 using AHeavyToll.UI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace AHeavyToll.Horror
 {
+#if UNITY_EDITOR
     [ExecuteInEditMode]
     public class HorrorSetupManager : MonoBehaviour
     {
@@ -479,4 +482,5 @@ namespace AHeavyToll.Horror
             return null;
         }
     }
+#endif
 }

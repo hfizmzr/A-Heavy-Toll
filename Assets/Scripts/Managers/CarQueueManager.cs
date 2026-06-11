@@ -26,6 +26,10 @@ namespace AHeavyToll.Managers
         [Header("Car Database")]
         public List<CarData> allCarData = new List<CarData>();
 
+        [Header("Jumpscare Delay")]
+        [SerializeField] private float jumpscareDelayMin = 4f;
+        [SerializeField] private float jumpscareDelayMax = 8f;
+
         [Header("Prefabs")]
         [SerializeField] private GameObject carPrefab; // Base car with CarController
 
@@ -66,10 +70,6 @@ namespace AHeavyToll.Managers
             {
                 if (currentCar == null)
                 {
-                    // Random mid-game jumpscare during idle gap
-                    if (carsProcessedThisNight > 0)
-                        JumpscareManager.Instance?.TryPlayMidGameJumpscare();
-
                     yield return new WaitForSeconds(timeBetweenCars);
 
                     if (!isQueueActive) yield break;
@@ -177,8 +177,8 @@ namespace AHeavyToll.Managers
 
             currentCar.SetDecision(allowThrough);
             GameManager.Instance?.RegisterCarDecision(
-                allowThrough, 
-                currentCar.Data.isMalevolent, 
+                allowThrough,
+                currentCar.Data.isMalevolent,
                 currentCar.Data.isHer
             );
 
@@ -187,6 +187,9 @@ namespace AHeavyToll.Managers
             {
                 HorrorEventManager.Instance?.TriggerEvent(currentCar.Data.horrorEventId);
             }
+
+            if (allowThrough && currentCar.Data.isMalevolent)
+                StartCoroutine(DelayedJumpscare());
 
             carsProcessedThisNight++;
             JournalSystem.Instance?.UnlockEntriesAfterCarCount(
@@ -203,6 +206,12 @@ namespace AHeavyToll.Managers
                 currentCar = null;
             }
             Destroy(car.gameObject, 2f);
+        }
+
+        private IEnumerator DelayedJumpscare()
+        {
+            yield return new WaitForSeconds(Random.Range(jumpscareDelayMin, jumpscareDelayMax));
+            JumpscareManager.Instance?.TryPlayMidGameJumpscare();
         }
 
         public void StopQueue()
